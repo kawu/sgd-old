@@ -1,45 +1,16 @@
-Name:               mrf
+Name:               sgd
 Version:            0.0.0
-Synopsis:           Markov random fields library.
-Description:        Library for Markov random fields (undirected graphical models).
+Synopsis:           Stochastic gradient descent library.
 License:            BSD3
 License-file:       LICENSE
 Author:             Jakub Waszczuk
 Maintainer:         waszczuk.kuba@gmail.com
 Build-type:         Simple
-Exposed-modules:    Data.MRF.Base
-                    Data.MRF.Generic
-                    Data.MRF.FactorGraph
-                    Data.MRF.ParamSet
-                    Data.MRF.Train.SGD
-                    Data.MRF.Inference
-		    Data.MRF.Values
-                    Data.MRF.Features
-Other-modules:      Data.MRF.Generic.FactorGraph
-                    Data.MRF.Generic.Feature
-                    Data.MRF.Generic.ParamSet
-                    Data.MRF.ParamSet.ParamMap
-                    Data.MRF.ParamSet.ParamArray
-                    Data.MRF.ParamSet.VectCore
-                    Data.MRF.Train.Gradient
-                    Data.MRF.MarkedArray
-                    Data.MRF.LogMath
-                    Data.MRF.Util
-                    Data.MRF.Vector.Binary
+Exposed-modules:    Data.MarkedArray
+                    SGD
+Other-modules:      SGD.Base
 Build-Depends:      base
-                  , primitive
-                  , containers
                   , vector
                   , array
                   , ListLike
-                  , listlike-instances
                   , random
-		  , parallel
-                  , binary
-extensions:         ForeignFunctionInterface
-                    MultiParamTypeClasses
-                    FunctionalDependencies
-                    FlexibleContexts
-                    FlexibleInstances
-                    UndecidableInstances
-                    TypeSynonymInstances

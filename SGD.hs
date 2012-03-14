@@ -92,15 +92,14 @@ updateParams args params grads batch scale trainSize =
         -- explicit concurrent computation of gradients
         com <- newEmptyMVar
         forM_ (zip grads parts) $ \(grad, part) -> forkIO $ do
-            computeGrad params part grad
-            MA.mapArray (*scale) grad
-            putMVar com ()
-        sequence_ [takeMVar com | _ <- [1..numCapabilities]]
+            grad' <- computeGrad params part grad
+            putMVar com =<< MA.mapArray (*scale) grad'
+        grads' <- sequence [takeMVar com | _ <- [1..numCapabilities]]
 
         params' <- unsafeMap regularization params
         result <- foldM (\params grad ->
-            applyGrad grad params) params' grads
-        forM_ grads MA.clear
+            applyGrad grad params) params' grads'
+        forM_ grads' MA.clear
         return result
 
 applyGrad :: ParamCore p => Grad -> p -> IO p

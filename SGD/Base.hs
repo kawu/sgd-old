@@ -36,9 +36,9 @@ class ParamCore p where
 
 
 class ParamCore p => DataElem p x where
-    -- | In-place gradient computation.  It is ensured, that initially
+    -- | Gradient computation.  It is ensured, that initially
     -- gradient is filled with 0 values.
-    computeGrad         :: p -> [x] -> Grad -> IO ()
+    computeGrad         :: p -> [x] -> Grad -> IO Grad
     -- | Accuracy on given data set.  Just for show.
     accuracy            :: p -> [x] -> Double
 
