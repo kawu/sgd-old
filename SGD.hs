@@ -1,5 +1,6 @@
 module SGD
 ( sgd
+, sgdArgsDefault
 , SgdArgs (..)
 , module SGD.Base
 ) where
@@ -23,6 +24,14 @@ data SgdArgs = SgdArgs
     , iterNum   :: Double
     , scale0    :: Double
     , tau       :: Double }
+
+sgdArgsDefault :: SgdArgs
+sgdArgsDefault = SgdArgs
+    { batchSize = 30
+    , regVar    = 10
+    , iterNum   = 10
+    , scale0    = 1
+    , tau       = 5 }
 
 sgd :: (ListLike v x, DataElem p x) => SgdArgs -> v -> v -> p -> IO p
 sgd args trainData evalData params = do
