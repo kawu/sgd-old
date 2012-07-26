@@ -1,5 +1,7 @@
-{-# LANGUAGE ExistentialQuantification
-           , FlexibleContexts #-}
+{-# LANGUAGE ExistentialQuantification #-}
+{-# LANGUAGE FlexibleContexts #-}
+{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE TupleSections #-}
 
 module Data.MarkedArray
 ( MarkedArray
@@ -10,6 +12,9 @@ module Data.MarkedArray
 , consumeWith
 ) where
 
+import System.IO.Unsafe (unsafeInterleaveIO)
+
+import Control.Applicative ((<$>))
 import Data.Ix (Ix, range)
 -- import qualified Data.Array.ST as A
 import qualified Data.Array.IO as A
@@ -32,9 +37,20 @@ new n = do
 
 elems :: MarkedArray -> IO [(Int, Double)]
 elems (MarkedArray arr _ trace) = do
-    -- return [(i, arr A.! i) | i <- trace]
-    values <- mapM (A.readArray arr) trace
-    return $ zip trace values
+    -- values <- mapM (A.readArray arr) trace
+    -- return $ zip trace values
+    mapM' (\i -> (i,) <$> A.readArray arr i) trace
+  where
+    sequence' (mx:xs) = unsafeInterleaveIO $
+        combine xs =<< mx
+        where combine xs x = return . (x:) =<< sequence' xs
+    sequence' [] = return []
+    
+    mapM' f (x:xs) = unsafeInterleaveIO $ do
+        y <- f x
+        ys <- mapM' f xs
+        return (y : ys)
+    mapM' _ [] = return []
 
 clear :: MarkedArray -> IO MarkedArray
 clear (MarkedArray arr barr trace) = do
@@ -58,7 +74,7 @@ consumeWith f xs ma@(MarkedArray arr barr trace) = do
 
 consumeElem :: (Double -> Double -> Double) -> MarkedArray
             -> [Int] -> (Int, Double) -> IO [Int]
-consumeElem f (MarkedArray arr barr _) trace (i, v) = do
+consumeElem f (MarkedArray arr barr _) (!trace) (i, v) = do
     b <- A.readArray barr i
     if b == False
         then do
